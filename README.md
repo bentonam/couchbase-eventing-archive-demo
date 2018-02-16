@@ -91,7 +91,7 @@ From the Admin Console, click on "Eventing"
 Click "Add" and fill out the following and then click "Continue"
 
 ```
-Source bucket: flight-data
+Source bucket: data
 Metadata bucket: metadata
 Name: func_archive
 Description:
@@ -160,3 +160,11 @@ docker exec eventing-nodejs \
 Each of the `trigger` documents will expiry every 5 seconds.  
 
 If you watch Couchbase Server, douments will begin to disappear from your bucket, additionally if you look at the project directory where you cloned the repo to, you'll see the documents being added to the `/backup` directory. 
+
+## Cleanup
+
+When you're finished with the enviroment bring down the Docker containers by running the following command:
+
+```bash
+docker-compose down -v
+```
