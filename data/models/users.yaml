@@ -1,0 +1,37 @@
+name: Users
+type: object
+key: _id
+data:
+  count: 100
+properties:
+  _id:
+    type: string
+    description: The document id
+    data:
+      post_build: "`user::${this.user_id}`"
+  _type:
+    type: string
+    description: The document type
+    data:
+      value: user
+  user_id:
+    type: integer
+    description: The users id
+    data:
+      build: document_index + 1
+  name:
+    type: string
+    data:
+      fake: "{{name.firstName}} {{name.lastName}}"
+  email:
+    type: string
+    data:
+      fake: "{{internet.email}}"
+  phone:
+    type: string
+    data:
+      build: chance.phone()
+  job_title:
+    type: string
+    data:
+      fake: "{{name.jobTitle}}"

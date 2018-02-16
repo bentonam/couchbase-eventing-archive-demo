@@ -1,0 +1,32 @@
+{
+  "name": "full-stack-development-with-javascript-and-nosql",
+  "author": "Aaron Benton <bentonam@gmail.com> (https://github.com/bentonam)",
+  "contributors": [],
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "build": "make install && make build",
+    "start": "make start"
+  },
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bentonam/full-stack-development-with-javascript-and-nosql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bentonam/full-stack-development-with-javascript-and-nosql/issues"
+  },
+  "engines": {
+    "node": ">=9"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "homepage": "https://github.com/bentonam/full-stack-development-with-javascript-and-nosql",
+  "dependencies": {
+    "couchbase": "2.4.3",
+    "hapi": "16.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "1.14.12"
+  }
+}

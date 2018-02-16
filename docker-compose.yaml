@@ -1,0 +1,29 @@
+version: '3.4'
+services:
+  nodejs:
+    build:
+      context: .
+      dockerfile: ./docker/nodejs/Dockerfile
+    container_name: eventing-nodejs
+    links:
+      - couchbase
+    volumes:
+      - ./app:/usr/src/app
+      - ./backup:/usr/backup
+    ports:
+      - 8080:8080
+  couchbase:
+    build:
+      context: ./docker/couchbase
+      args:
+        PACKAGE_URL: http://couchbase:YAN3FrT7k@nas.service.couchbase.com/builds/latestbuilds/couchbase-server/vulcan/1904/couchbase-server-enterprise-5.5.0-1904-centos7.x86_64.rpm
+    container_name: eventing-couchbase
+    ports:
+      - 8091-8094:8091-8094
+      - 11210:11210
+    volumes:
+      - ./data:/usr/data
+    environment:
+      CLUSTER_USERNAME: Administrator
+      CLUSTER_PASSWORD: password
+      SERVICES: data,index,query,eventing

@@ -1,0 +1,10 @@
+*.apdisk
+*.ap_
+*.log
+*.DS_Store
+*.bak
+*.csv
+*.TemporaryItems
+*.pdf
+backup/*.json
+node_modules
