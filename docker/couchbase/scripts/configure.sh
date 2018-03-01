@@ -10,7 +10,7 @@ SERVICES=${SERVICES:='data,index,query,fts,eventing'}
 
 echo ' '
 printf 'Waiting for Couchbase Server to start'
-until $(curl --output /dev/null --silent --head --fail http://localhost:8091/pools); do
+until $(curl --output /dev/null --silent --head --fail -u Administrator:password http://localhost:8091/pools); do
   printf .
   sleep 1
 done
@@ -56,13 +56,29 @@ echo Setting the Cluster Name
 # buckets
 sleep 3
 
-echo Creating "data" bucket
+echo Creating "users" bucket
 /opt/couchbase/bin/couchbase-cli bucket-create \
   --cluster localhost:8091 \
   --user=$CLUSTER_USERNAME \
   --password=$CLUSTER_PASSWORD \
-  --bucket=data \
-  --bucket-ramsize=300 \
+  --bucket=users \
+  --bucket-ramsize=100 \
+  --bucket-type=couchbase \
+  --enable-index-replica=0 \
+  --enable-flush=1 \
+  --bucket-replica=0 \
+  --bucket-eviction-policy=valueOnly \
+  --wait
+
+sleep 3
+
+echo Creating "trigger" bucket
+/opt/couchbase/bin/couchbase-cli bucket-create \
+  --cluster localhost:8091 \
+  --user=$CLUSTER_USERNAME \
+  --password=$CLUSTER_PASSWORD \
+  --bucket=trigger \
+  --bucket-ramsize=100 \
   --bucket-type=couchbase \
   --enable-index-replica=0 \
   --enable-flush=1 \

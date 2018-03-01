@@ -8,7 +8,7 @@
     "build": "make install && make build",
     "start": "make start"
   },
-  "main": "dist/index.js",
+  "main": "/usrc/src/app/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bentonam/full-stack-development-with-javascript-and-nosql.git"

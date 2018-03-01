@@ -60,13 +60,13 @@ docker exec eventing-couchbase \
 	--server localhost \
 	--username Administrator \
 	--password password \
-	--bucket data \
+	--bucket users \
 	--seed demo \
 	--count 1000 \
 	/usr/data/models/users.yaml
 ```
 
-This will load the `data` bucket with `1,000` user documents documents. 
+This will load the `users` bucket with `1,000` user documents documents. 
 
 For reference the documents are modeled as follows: 
 
@@ -84,23 +84,13 @@ For reference the documents are modeled as follows:
 
 ## Eventing Function
 
-Now we need to define an eventing function.  That will fire when documents expire, we will create the expiry documents in the next section. 
+Now we need to define an eventing function that will fire when documents expire, we will create the expiry documents in the next section.  We will load documents into the `trigger` bucket, and as they expire we'll retrieve the corresponding document from the `users` bucket and archive it. 
 
 From the Admin Console, click on "Eventing"
 
-Click "Add" and fill out the following and then click "Continue"
+Click "Add" and fill out the following and then click "Next: Add Code"
 
-```
-Source bucket: data
-Metadata bucket: metadata
-Name: func_archive
-Description:
-	This uses the OnDelete handler to archive expired documents
-RBAC username: Administrator
-RBAC password: password
-```
-
-Click "Continue"
+![](assets/eventing-function.png)
 
 This will deploy a shell of our function that looks similar to:
 
@@ -117,25 +107,19 @@ function OnDelete(meta) {
     try {
         if (meta.id.indexOf('::trigger') !== -1) {
             var id = meta.id.replace(/::trigger$/, '')
-            var query = SELECT d.* FROM `data` AS d USE KEYS [ :id ];
-            var doc = query.execQuery()[0];
+            var doc = src[id];
             // call the external api if there's a document
             if (doc) {
-                var http = SELECT CURL(
-                    "http://eventing-nodejs:8080/archive/" || :id,
-                    {
-                        "request":"POST", 
-                        "header": "Content-Type: application/json",
-                        "data": :doc
-                    });
-                http.execQuery();
+                curl("http://eventing-nodejs:8080/archive/" + id, {
+                    "method":"POST", 
+                    "data": doc 
+                });
                 // delete it from the src bucket
-                var del = DELETE FROM `data` USE KEYS [ :id ];
-                del.execQuery();
+               delete src[id];
             }
         }
     } catch (err) {
-        log('Error', err); 
+        log('Error', err);
     }
 }
 ```

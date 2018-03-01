@@ -8,8 +8,8 @@ services:
     links:
       - couchbase
     volumes:
-      - ./app:/usr/src/app
       - ./backup:/usr/backup
+      - ./app:/usr/src/app
     ports:
       - 8080:8080
   couchbase:
