@@ -7,7 +7,13 @@ const bucket = cluster.openBucket('trigger')
 const users = 1000
 
 for (let i = 1; i <= users; i++) {
-  bucket.upsert(`user::${i}::trigger`, null, { expiry: i * 2 }, (err) => {
+  // insert a null document with a random expiry between 5 - 300
+  bucket.upsert(
+    `user::${i}::trigger`,
+    null,
+    {
+      expiry: Math.floor(Math.random() * 300) + 5
+    }, (err) => {
     if (err) {
       throw err
     }

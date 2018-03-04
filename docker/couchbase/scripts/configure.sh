@@ -46,6 +46,15 @@ fi
 CMD="$CMD --services=$SERVICES"
 eval $CMD
 
+# add curl whitelist settings
+curl --output /dev/null \
+  --silent \
+  -u Administrator:password \
+  -H "Content-Type: application/json" \
+  -X POST \
+  -d '{"all_access":true,"allowed_urls":["http://eventing-nodejs:8080"],"disallowed_urls":[]}' \
+  http://localhost:8091/settings/querySettings/curlWhitelist
+
 echo Setting the Cluster Name
 /opt/couchbase/bin/couchbase-cli setting-cluster \
   --cluster localhost:8091 \
@@ -56,28 +65,27 @@ echo Setting the Cluster Name
 # buckets
 sleep 3
 
-echo Creating "users" bucket
-/opt/couchbase/bin/couchbase-cli bucket-create \
-  --cluster localhost:8091 \
-  --user=$CLUSTER_USERNAME \
-  --password=$CLUSTER_PASSWORD \
-  --bucket=users \
-  --bucket-ramsize=100 \
-  --bucket-type=couchbase \
-  --enable-index-replica=0 \
-  --enable-flush=1 \
-  --bucket-replica=0 \
-  --bucket-eviction-policy=valueOnly \
-  --wait
-
-sleep 3
-
 echo Creating "trigger" bucket
 /opt/couchbase/bin/couchbase-cli bucket-create \
   --cluster localhost:8091 \
   --user=$CLUSTER_USERNAME \
   --password=$CLUSTER_PASSWORD \
   --bucket=trigger \
+  --bucket-ramsize=100 \
+  --bucket-type=ephemeral \
+  --enable-flush=1 \
+  --bucket-replica=0 \
+  --bucket-eviction-policy=noEviction \
+  --wait
+
+sleep 3
+
+echo Creating "users" bucket
+/opt/couchbase/bin/couchbase-cli bucket-create \
+  --cluster localhost:8091 \
+  --user=$CLUSTER_USERNAME \
+  --password=$CLUSTER_PASSWORD \
+  --bucket=users \
   --bucket-ramsize=100 \
   --bucket-type=couchbase \
   --enable-index-replica=0 \
@@ -101,5 +109,15 @@ echo Creating "metadata" bucket
   --bucket-replica=0 \
   --bucket-eviction-policy=valueOnly \
   --wait
+
+sleep 5
+
+# Change the expiry pager for the trigger bucket to 1 sec
+cbepctl localhost:11210 \
+  -u $CLUSTER_USERNAME \
+  -p $CLUSTER_PASSWORD \
+  -b trigger \
+  set flush_param exp_pager_stime 1
+
 
 echo The $CLUSTER_NAME cluster has been successfully configured

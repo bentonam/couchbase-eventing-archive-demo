@@ -110,10 +110,14 @@ function OnDelete(meta) {
             var doc = src[id];
             // call the external api if there's a document
             if (doc) {
-                curl("http://eventing-nodejs:8080/archive/" + id, {
-                    "method":"POST", 
-                    "data": doc 
-                });
+                var http = SELECT CURL(
+                    "http://eventing-nodejs:8080/archive/" || $id,
+                    {
+                        "request":"POST", 
+                        "header": "Content-Type: application/json",
+                        "data": $doc
+                    });
+                http.execQuery();
                 // delete it from the src bucket
                delete src[id];
             }
@@ -141,9 +145,10 @@ docker exec eventing-nodejs \
 	/usr/src/app/load.js
 ```
 
-Each of the `trigger` documents will expiry every 5 seconds.  
+Each of the `trigger` documents will expiry every 3 seconds.  
 
 If you watch Couchbase Server, douments will begin to disappear from your bucket, additionally if you look at the project directory where you cloned the repo to, you'll see the documents being added to the `/backup` directory. 
+
 
 ## Cleanup
 
